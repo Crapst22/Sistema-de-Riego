@@ -1,6 +1,14 @@
 import type { Metadata } from 'next';
+import { Quicksand } from 'next/font/google';
 
 import './globals.css';
+
+const quicksand = Quicksand({
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-quicksand',
+});
 
 export const metadata: Metadata = {
   title: 'Plantita · Riego Inteligente',
@@ -9,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className="dark" suppressHydrationWarning>
+    <html lang="es" className={`dark ${quicksand.variable}`} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
