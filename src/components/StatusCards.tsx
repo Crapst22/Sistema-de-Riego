@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-import type { Configuracion, Lectura } from '@/lib/types';
+import type { Configuracion, EstadoSuelo, Lectura } from '@/lib/types';
 
 type Props = {
   lectura: Lectura | undefined;
@@ -30,8 +30,21 @@ type HumedadEstado = {
   fondo: string;
 };
 
-function estadoHumedad(humedad: number, umbral: number): HumedadEstado {
-  if (humedad < umbral) {
+function estadoHumedad(
+  humedad: number,
+  umbral: number,
+  estadoSuelo: EstadoSuelo = 'ok',
+): HumedadEstado {
+  if (estadoSuelo === 'exceso' || humedad > 85) {
+    return {
+      etiqueta: 'Exceso de agua',
+      detalle: 'Por encima del rango ideal',
+      color: '#3d7f92',
+      texto: 'text-sky-600 dark:text-sky-400',
+      fondo: 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300',
+    };
+  }
+  if (estadoSuelo === 'seco' || humedad < umbral) {
     return {
       etiqueta: 'Suelo seco',
       detalle: 'Por debajo del umbral',
@@ -98,9 +111,11 @@ function Tarjeta({
 export default function StatusCards({ lectura, configuracion, ahora, realtime }: Props) {
   const humedad = lectura?.humedad ?? 0;
   const umbral = configuracion?.umbral_humedad_minima ?? 30;
-  const estado = estadoHumedad(humedad, umbral);
+  const estado = estadoHumedad(humedad, umbral, lectura?.estado_suelo);
   const riego = lectura?.estado_riego ?? false;
   const alarma = lectura?.alarma_activa ?? false;
+  const exceso = lectura?.estado_suelo === 'exceso' || (alarma && humedad > 85);
+  const motivoAlarma = exceso ? 'Exceso de agua' : 'Sequía detectada';
   const timestamp = lectura ? new Date(lectura.created_at).getTime() : Number.NaN;
   const conexionMs = Number.isFinite(timestamp) ? ahora - timestamp : Number.NaN;
   const conectado = Number.isFinite(conexionMs) && conexionMs < 30000;
@@ -192,7 +207,7 @@ export default function StatusCards({ lectura, configuracion, ahora, realtime }:
           <span className="text-2xl font-bold tracking-tight">{riego ? 'ACTIVO' : 'INACTIVO'}</span>
         </div>
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-          {riego ? 'Bomba / LED D1 encendido' : 'Bomba / LED D1 apagado'}
+          {riego ? 'Bomba / LED D0 encendido' : 'Bomba / LED D0 apagado'}
         </p>
         <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <div
@@ -221,7 +236,7 @@ export default function StatusCards({ lectura, configuracion, ahora, realtime }:
           )}
         </div>
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-          {alarma ? 'Sequía detectada · buzzer D2' : 'Sin incidencias · buzzer D2'}
+          {alarma ? `${motivoAlarma} · buzzer D1` : 'Sin incidencias · buzzer D1'}
         </p>
         <span
           className={`mt-4 inline-flex rounded-lg px-2.5 py-1 text-[11px] font-semibold ${

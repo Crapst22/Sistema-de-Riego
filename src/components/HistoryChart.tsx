@@ -35,6 +35,7 @@ export default function HistoryChart({
           id: lectura.id,
           humedad: lectura.humedad,
           riego: lectura.estado_riego,
+          estadoSuelo: lectura.estado_suelo,
           hora: new Date(lectura.created_at).toLocaleTimeString('es-ES', {
             hour: '2-digit',
             minute: '2-digit',

@@ -93,7 +93,11 @@ export default function ReadingsTable({ lecturas }: { lecturas: Lectura[] }) {
                     }`}
                   >
                     <Siren className="h-3 w-3" />
-                    {lectura.alarma_activa ? 'Alerta' : 'Normal'}
+                    {lectura.alarma_activa
+                      ? lectura.estado_suelo === 'exceso'
+                        ? 'Exceso'
+                        : 'Sequía'
+                      : 'Normal'}
                   </span>
                 </td>
                 <td className="px-5 py-3 text-right font-mono text-xs text-slate-400 sm:px-6">

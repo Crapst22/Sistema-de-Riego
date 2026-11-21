@@ -5,8 +5,13 @@ create table if not exists public.lecturas_sensor (
   humedad integer not null check (humedad >= 0 and humedad <= 100),
   estado_riego boolean not null default false,
   alarma_activa boolean not null default false,
+  estado_suelo text not null default 'ok' check (estado_suelo in ('ok', 'seco', 'exceso')),
   created_at timestamptz not null default now()
 );
+
+alter table public.lecturas_sensor
+  add column if not exists estado_suelo text not null default 'ok'
+  check (estado_suelo in ('ok', 'seco', 'exceso'));
 
 create index if not exists lecturas_sensor_created_at_idx
   on public.lecturas_sensor (created_at desc);

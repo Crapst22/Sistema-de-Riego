@@ -57,7 +57,7 @@ export default function Dashboard() {
     const [lecturasResult, configuracionResult] = await Promise.all([
       supabase
         .from('lecturas_sensor')
-        .select('id, humedad, estado_riego, alarma_activa, created_at')
+        .select('id, humedad, estado_riego, alarma_activa, estado_suelo, created_at')
         .order('created_at', { ascending: false })
         .limit(50),
       supabase
@@ -341,7 +341,7 @@ export default function Dashboard() {
             <CloudSun className="h-3.5 w-3.5" />
             Plantita IoT · ESP8266 + Supabase Realtime + Vercel
           </span>
-          <span>Telemetría cada 4 s · LED D1 simula la bomba</span>
+          <span>Telemetría cada 4 s · LED D0 simula la bomba</span>
         </footer>
       </main>
     </div>

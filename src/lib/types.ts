@@ -1,8 +1,11 @@
+export type EstadoSuelo = 'ok' | 'seco' | 'exceso';
+
 export type Lectura = {
   id: number;
   humedad: number;
   estado_riego: boolean;
   alarma_activa: boolean;
+  estado_suelo: EstadoSuelo;
   created_at: string;
 };
 
@@ -18,6 +21,7 @@ export type TelemetryPayload = {
   humedad: number;
   estado_riego: boolean;
   alarma_activa: boolean;
+  estado_suelo?: EstadoSuelo;
 };
 
 export type TelemetryResponse = {

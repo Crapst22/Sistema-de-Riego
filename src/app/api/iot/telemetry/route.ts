@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 import {
   CONFIGURACION_PREDETERMINADA,
+  type EstadoSuelo,
   type TelemetryPayload,
   type TelemetryResponse,
 } from '@/lib/types';
@@ -26,13 +27,19 @@ function esTelemetryPayload(value: unknown): value is TelemetryPayload {
   if (typeof value !== 'object' || value === null) return false;
   const payload = value as Record<string, unknown>;
 
+  const estadoSueloValido =
+    payload.estado_suelo === undefined ||
+    (typeof payload.estado_suelo === 'string' &&
+      ['ok', 'seco', 'exceso'].includes(payload.estado_suelo));
+
   return (
     typeof payload.humedad === 'number' &&
     Number.isInteger(payload.humedad) &&
     payload.humedad >= 0 &&
     payload.humedad <= 100 &&
     typeof payload.estado_riego === 'boolean' &&
-    typeof payload.alarma_activa === 'boolean'
+    typeof payload.alarma_activa === 'boolean' &&
+    estadoSueloValido
   );
 }
 
@@ -60,7 +67,7 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error:
-          'Se requiere { humedad: integer 0-100, estado_riego: boolean, alarma_activa: boolean }',
+          'Se requiere { humedad: integer 0-100, estado_riego: boolean, alarma_activa: boolean, estado_suelo?: "ok" | "seco" | "exceso" }',
       },
       { status: 400 },
     );
@@ -74,10 +81,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const estadoSuelo: EstadoSuelo =
+    body.estado_suelo ?? (body.humedad > 85 ? 'exceso' : body.humedad < 30 ? 'seco' : 'ok');
+
   const { error: insercionError } = await supabase.from('lecturas_sensor').insert({
     humedad: body.humedad,
     estado_riego: body.estado_riego,
     alarma_activa: body.alarma_activa,
+    estado_suelo: estadoSuelo,
   });
 
   if (insercionError) {

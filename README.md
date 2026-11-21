@@ -74,16 +74,16 @@ Si actualizas variables de entorno después de desplegar, haz `npx vercel --prod
 
 1. Instala Arduino IDE y la placa **ESP8266 Boards** (http://arduino.esp8266.com/stable/package_esp8266com_index.json).
 2. Instala la librería **ArduinoJson** (versión 6.x) y usa las librerías incluidas `ESP8266WiFi`, `ESP8266HTTPClient` y `WiFiClientSecure`.
-3. Abre `firmware/esp8266_riego.ino` y rellena arriba:
+3. Abre `firmware/esp8266_riego.ino` y rellena arriba (o usa `firmware/esp8266_riego_local.ino`, ignorado por Git, para no subir tus credenciales):
    - `WIFI_SSID` / `WIFI_PASSWORD`
    - `SERVER_URL` con tu URL de Vercel + `/api/iot/telemetry`
    - `IOT_API_KEY` con el mismo valor de Vercel
-4. Ajusta la calibración del sensor si hace falta: `VALOR_SENSOR_AIRE` (suelo seco) y `VALOR_SENSOR_AGUA` (suelo saturado). Para sensores capacitivos típicos, seco ≈ 760 y mojado ≈ 320 en A0; para sensores resistivos puede estar invertido (intercambia ambos valores).
+4. Ajusta la calibración del sensor si hace falta: `VALOR_SECO` (sonda al aire) y `VALOR_AGUA` (tierra bien mojada). El sketch viene con 1000 y 400; verifica el valor `Crudo` en el monitor serial seco y mojado.
 5. Selecciona **NodeMCU 1.0 (ESP-12E Module)**, el puerto COM correcto y sube el sketch.
 
-Conexiones: sensor → A0, LED con resistencia → D1 (GPIO5), buzzer → D2 (GPIO4), GND común y alimentación 3.3 V.
+Conexiones: sensor → A0, buzzer → D1 (GPIO5), LED con resistencia → D0 (GPIO16), GND común y alimentación 3.3 V.
 
-El sketch envía telemetría cada 4 s, aplica el modo automático (riego + alarma si `humedad < umbral`) o el modo manual, y con la respuesta de la nube actualiza modo, riego manual y umbral. `WiFiClientSecure.setInsecure()` se usa para simplificar HTTPS en el prototipo; en producción se recomienda fijar el certificado/SNI o el fingerprint.
+El sketch conserva la máquina de estados con histéresis: por debajo de `umbral_humedad_minima` pasa a `seco` (riego + alarma), no sale de ahí hasta `umbral + 10`, y por encima de 85% reporta `exceso` (alarma sin riego). En modo automático el LED D0 parpadea mientras riega; en modo manual queda fijo según el botón web. Envía telemetría cada 4 s con `humedad`, `estado_riego`, `alarma_activa`, `estado_suelo` (`ok`/`seco`/`exceso`) y `lectura_cruda`, y con la respuesta actualiza modo, riego manual y umbral. `WiFiClientSecure.setInsecure()` simplifica HTTPS en el prototipo.
 
 ## Endpoints
 
@@ -93,7 +93,7 @@ Telemetría (ESP8266):
 curl -X POST https://TU-DOMINIO.vercel.app/api/iot/telemetry \
   -H 'Content-Type: application/json' \
   -H 'x-api-key: TU_IOT_API_KEY' \
-  -d '{"humedad":24,"estado_riego":true,"alarma_activa":true}'
+  -d '{"humedad":24,"estado_riego":true,"alarma_activa":true,"estado_suelo":"seco"}'
 ```
 
 Respuesta:

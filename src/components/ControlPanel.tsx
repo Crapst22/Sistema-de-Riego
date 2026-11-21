@@ -148,7 +148,7 @@ export default function ControlPanel({
             <p className="mt-2 text-center text-[11px] text-slate-400 dark:text-slate-500">
               {modoAutomatico
                 ? 'El pulso cambia a manual 10 s y luego restaura el modo automático.'
-                : 'El LED D1 permanece encendido hasta que lo detengas.'}
+                : 'El LED D0 permanece encendido hasta que lo detengas.'}
             </p>
           </div>
         </div>

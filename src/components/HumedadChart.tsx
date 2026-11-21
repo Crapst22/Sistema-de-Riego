@@ -17,6 +17,7 @@ export type PuntoHistorial = {
   hora: string;
   humedad: number;
   riego: boolean;
+  estadoSuelo: string;
 };
 
 function TooltipRiego({ active, payload, label }: TooltipProps<number, string>) {
@@ -30,6 +31,7 @@ function TooltipRiego({ active, payload, label }: TooltipProps<number, string>) 
       <p className={punto.riego ? 'text-brand-400' : 'text-slate-400'}>
         Riego: {punto.riego ? 'activo' : 'inactivo'}
       </p>
+      <p className="mt-0.5 text-slate-400">Suelo: {punto.estadoSuelo}</p>
     </div>
   );
 }
