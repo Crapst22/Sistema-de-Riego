@@ -124,6 +124,7 @@ También acepta `{"umbral_humedad_minima": 35}`.
 ## Solución de problemas
 
 - **Forbidden use of secret API key in browser:** cambia `NEXT_PUBLIC_SUPABASE_ANON_KEY` por la clave anon/public y vuelve a desplegar (`npx vercel --prod`). Las `NEXT_PUBLIC_*` se graban en el build.
+- **permission denied for table lecturas_sensor:** vuelve a ejecutar `supabase/schema.sql` en el SQL Editor (es idempotente). Ahora incluye `GRANT` explícitos a `anon`/`authenticated` y políticas por rol; verifica además que estás en el mismo proyecto de `NEXT_PUBLIC_SUPABASE_URL`.
 - **Los botones se quedan en «Guardando…»:** comprueba que `/api/control` responde y que `IOT_API_KEY` está definida; el dashboard aborta la petición después de 10 s y muestra el error.
 - **El umbral no se refleja arriba:** el valor se actualiza al soltar el slider; si no cambia, la configuración no se guardó (revisa el error anterior).
 

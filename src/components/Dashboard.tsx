@@ -14,6 +14,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import ControlPanel from '@/components/ControlPanel';
 import HistoryChart from '@/components/HistoryChart';
+import LinkStatus from '@/components/LinkStatus';
 import ReadingsTable from '@/components/ReadingsTable';
 import StatusCards from '@/components/StatusCards';
 import { motivoConfiguracionSupabase, supabaseBrowser } from '@/lib/supabase/client';
@@ -291,6 +292,15 @@ export default function Dashboard() {
             </button>
           </div>
         )}
+
+        <LinkStatus
+          lectura={ultima}
+          configuracion={configuracion}
+          ahora={ahora}
+          realtime={realtime}
+          configurado={configurado}
+          error={error}
+        />
 
         <div className="flex items-center justify-between px-1">
           <h2 className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">

@@ -26,10 +26,16 @@ on conflict (id) do nothing;
 alter table public.lecturas_sensor enable row level security;
 alter table public.configuracion_sistema enable row level security;
 
+grant usage on schema public to anon, authenticated, service_role;
+grant select, insert, update, delete on public.lecturas_sensor to anon, authenticated, service_role;
+grant select, insert, update, delete on public.configuracion_sistema to anon, authenticated, service_role;
+grant usage, select on all sequences in schema public to anon, authenticated, service_role;
+
 drop policy if exists "lecturas_sensor_all" on public.lecturas_sensor;
 create policy "lecturas_sensor_all"
   on public.lecturas_sensor
   for all
+  to anon, authenticated, service_role
   using (true)
   with check (true);
 
@@ -37,6 +43,7 @@ drop policy if exists "configuracion_sistema_all" on public.configuracion_sistem
 create policy "configuracion_sistema_all"
   on public.configuracion_sistema
   for all
+  to anon, authenticated, service_role
   using (true)
   with check (true);
 
