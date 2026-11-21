@@ -16,7 +16,7 @@ import ControlPanel from '@/components/ControlPanel';
 import HistoryChart from '@/components/HistoryChart';
 import ReadingsTable from '@/components/ReadingsTable';
 import StatusCards from '@/components/StatusCards';
-import { supabaseBrowser } from '@/lib/supabase/client';
+import { motivoConfiguracionSupabase, supabaseBrowser } from '@/lib/supabase/client';
 import {
   CONFIGURACION_PREDETERMINADA,
   type Configuracion,
@@ -39,7 +39,9 @@ export default function Dashboard() {
   const pulso = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const configurado = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY),
   );
 
   const cargarDatos = useCallback(async () => {
@@ -101,7 +103,7 @@ export default function Dashboard() {
     const supabase = supabaseBrowser();
     if (!supabase) {
       setCargando(false);
-      setError('Faltan NEXT_PUBLIC_SUPABASE_URL y/o NEXT_PUBLIC_SUPABASE_ANON_KEY.');
+      setError(motivoConfiguracionSupabase());
       return;
     }
 
@@ -143,26 +145,42 @@ export default function Dashboard() {
       setError(null);
       setConfiguracion((anterior) => (anterior ? { ...anterior, ...update } : anterior));
 
+      const controlador = new AbortController();
+      const temporizador = setTimeout(() => controlador.abort(), 10000);
+
       try {
         const respuesta = await fetch('/api/control', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(update),
+          signal: controlador.signal,
         });
-        const resultado: { ok: boolean; error?: string; configuracion?: Configuracion } =
-          await respuesta.json();
+        const texto = await respuesta.text();
+        let resultado: { ok?: boolean; error?: string; configuracion?: Configuracion } = {};
+
+        try {
+          resultado = texto ? JSON.parse(texto) : {};
+        } catch {
+          resultado = {};
+        }
 
         if (!respuesta.ok || !resultado.configuracion) {
-          setError(resultado.error ?? 'No se pudo guardar la configuración');
+          setError(resultado.error ?? `No se pudo guardar (HTTP ${respuesta.status}).`);
           await cargarDatos();
           return;
         }
 
         setConfiguracion(resultado.configuracion);
-      } catch {
-        setError('No se pudo contactar con el servidor.');
+      } catch (error) {
+        const abortado = error instanceof DOMException && error.name === 'AbortError';
+        setError(
+          abortado
+            ? 'El servidor tardó demasiado en responder.'
+            : 'No se pudo contactar con el servidor.',
+        );
         await cargarDatos();
       } finally {
+        clearTimeout(temporizador);
         setBusy(false);
       }
     },

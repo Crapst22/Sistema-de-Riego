@@ -17,7 +17,7 @@ firmware/esp8266_riego.ino          Sketch Arduino para NodeMCU
 
 1. Crea un proyecto en [supabase.com](https://supabase.com).
 2. En **SQL Editor**, pega y ejecuta todo el contenido de `supabase/schema.sql`.
-3. En **Project Settings → API**, copia el **Project URL** y el **anon public key**.
+3. En **Project Settings → API**, copia el **Project URL** y el **anon public key**. La clave debe empezar por `sb_publishable_` o ser un JWT con `role: anon`. Si usas `service_role` o `sb_secret_`, aparecerá el error *Forbidden use of secret API key in browser*.
 
 El script crea `lecturas_sensor` y `configuracion_sistema` (fila `id = 1`), índice por fecha, trigger de `updated_at`, políticas RLS abiertas para prototipado y añade ambas tablas a la publicación `supabase_realtime`.
 
@@ -31,11 +31,11 @@ Edita `.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_xxxx
 IOT_API_KEY=una-clave-larga-y-aleatoria
 ```
 
-`IOT_API_KEY` debe ser exactamente la misma que pegues en el firmware. Usa la anon key **pública** (no la service_role) porque RLS ya está configurado para el prototipo.
+También puedes nombrar la clave pública `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`; el código acepta ambos nombres. `IOT_API_KEY` debe ser exactamente la misma que pegues en el firmware. Usa la clave **publishable/anon** (nunca `service_role`/`sb_secret_`) porque RLS ya está configurado para el prototipo. `SUPABASE_JWKS_URL` no se necesita en esta aplicación.
 
 ## 3. Ejecutar en local
 
@@ -120,6 +120,12 @@ curl -X POST https://TU-DOMINIO.vercel.app/api/control \
 ```
 
 También acepta `{"umbral_humedad_minima": 35}`.
+
+## Solución de problemas
+
+- **Forbidden use of secret API key in browser:** cambia `NEXT_PUBLIC_SUPABASE_ANON_KEY` por la clave anon/public y vuelve a desplegar (`npx vercel --prod`). Las `NEXT_PUBLIC_*` se graban en el build.
+- **Los botones se quedan en «Guardando…»:** comprueba que `/api/control` responde y que `IOT_API_KEY` está definida; el dashboard aborta la petición después de 10 s y muestra el error.
+- **El umbral no se refleja arriba:** el valor se actualiza al soltar el slider; si no cambia, la configuración no se guardó (revisa el error anterior).
 
 ## Notas de seguridad
 
