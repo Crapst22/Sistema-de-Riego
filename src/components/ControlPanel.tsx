@@ -177,7 +177,7 @@ export default function ControlPanel({
               aria-label="Umbral mínimo de humedad"
               className="mt-6 w-full cursor-pointer"
               style={{
-                background: `linear-gradient(to right, #10b981 ${umbral}%, var(--slider-track) ${umbral}%)`,
+                background: `linear-gradient(to right, #6a9e3f ${umbral}%, var(--slider-track) ${umbral}%)`,
               }}
             />
             <div className="mt-2 flex justify-between font-mono text-[10px] text-slate-400">

@@ -201,11 +201,14 @@ export default function Dashboard() {
               <Sprout className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight sm:text-2xl">
+              <p className="font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-brand-600 dark:text-brand-400">
+                Estación de riego · nodo 01
+              </p>
+              <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
                 Plantita <span className="text-brand-500">·</span> Riego Inteligente
               </h1>
               <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
-                Monitoreo y control remoto · ESP8266 NodeMCU
+                Humedad, riego y alarma del ESP8266
               </p>
             </div>
           </div>
@@ -310,7 +313,7 @@ export default function Dashboard() {
             <CloudSun className="h-3.5 w-3.5" />
             Plantita IoT · ESP8266 + Supabase Realtime + Vercel
           </span>
-          <span>Datos simulados en vivo cada 3–5 s</span>
+          <span>Telemetría cada 4 s · LED D1 simula la bomba</span>
         </footer>
       </main>
     </div>

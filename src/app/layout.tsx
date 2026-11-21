@@ -1,13 +1,24 @@
 import type { Metadata } from 'next';
-import { Quicksand } from 'next/font/google';
+import { Bricolage_Grotesque, DM_Sans, JetBrains_Mono } from 'next/font/google';
 
 import './globals.css';
 
-const quicksand = Quicksand({
+const display = Bricolage_Grotesque({
   subsets: ['latin'],
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-quicksand',
+  variable: '--font-display',
+});
+
+const body = DM_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-body',
+});
+
+const data = JetBrains_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-data',
 });
 
 export const metadata: Metadata = {
@@ -17,7 +28,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`dark ${quicksand.variable}`} suppressHydrationWarning>
+    <html
+      lang="es"
+      className={`dark ${display.variable} ${body.variable} ${data.variable}`}
+      suppressHydrationWarning
+    >
       <body>{children}</body>
     </html>
   );

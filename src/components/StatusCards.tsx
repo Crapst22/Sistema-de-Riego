@@ -35,7 +35,7 @@ function estadoHumedad(humedad: number, umbral: number): HumedadEstado {
     return {
       etiqueta: 'Suelo seco',
       detalle: 'Por debajo del umbral',
-      color: '#f43f5e',
+      color: '#dc7255',
       texto: 'text-rose-600 dark:text-rose-400',
       fondo: 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300',
     };
@@ -44,7 +44,7 @@ function estadoHumedad(humedad: number, umbral: number): HumedadEstado {
     return {
       etiqueta: 'Humedad óptima',
       detalle: 'Dentro del rango ideal',
-      color: '#10b981',
+      color: '#6a9e3f',
       texto: 'text-brand-600 dark:text-brand-400',
       fondo: 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300',
     };
@@ -52,7 +52,7 @@ function estadoHumedad(humedad: number, umbral: number): HumedadEstado {
   return {
     etiqueta: 'Suelo húmedo',
     detalle: 'Por encima del rango ideal',
-    color: '#0ea5e9',
+    color: '#3d7f92',
     texto: 'text-sky-600 dark:text-sky-400',
     fondo: 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300',
   };
@@ -104,8 +104,7 @@ export default function StatusCards({ lectura, configuracion, ahora, realtime }:
   const timestamp = lectura ? new Date(lectura.created_at).getTime() : Number.NaN;
   const conexionMs = Number.isFinite(timestamp) ? ahora - timestamp : Number.NaN;
   const conectado = Number.isFinite(conexionMs) && conexionMs < 30000;
-  const radio = 52;
-  const circunferencia = 2 * Math.PI * radio;
+  const nivel = Math.min(100, Math.max(0, humedad));
 
   return (
     <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -119,38 +118,43 @@ export default function StatusCards({ lectura, configuracion, ahora, realtime }:
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <div className="relative h-32 w-32 shrink-0">
-            <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
-              <circle
-                cx="70"
-                cy="70"
-                r={radio}
-                fill="none"
-                strokeWidth="11"
-                className="stroke-slate-200 dark:stroke-slate-800"
-              />
-              <circle
-                cx="70"
-                cy="70"
-                r={radio}
-                fill="none"
-                strokeWidth="11"
-                strokeLinecap="round"
-                stroke={estado.color}
-                strokeDasharray={circunferencia}
-                strokeDashoffset={circunferencia * (1 - Math.min(100, Math.max(0, humedad)) / 100)}
-                style={{ transition: 'stroke-dashoffset 600ms ease, stroke 300ms ease' }}
-              />
+          <div className="relative h-40 w-24 shrink-0">
+            <svg
+              viewBox="0 0 40 28"
+              className="absolute -top-2 left-1/2 z-10 h-10 w-10 -translate-x-1/2 text-brand-500"
+            >
+              <path d="M20 27V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <path d="M20 18C12 18 8 13 8 7c7-1 12 4 12 11Z" fill="currentColor" opacity="0.85" />
+              <path d="M20 16c8 0 12-5 12-11-7-1-12 4-12 11Z" fill="currentColor" opacity="0.6" />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="font-mono text-3xl font-bold tabular-nums tracking-tight">
-                {humedad}
-                <span className="ml-0.5 text-base text-slate-400">%</span>
-              </span>
-              <span className="text-[10px] uppercase tracking-widest text-slate-400">A0</span>
+            <div className="absolute inset-x-0 bottom-0 top-5 overflow-hidden rounded-xl border border-slate-300/80 bg-slate-100 shadow-inner dark:border-slate-700 dark:bg-slate-900">
+              <div
+                className="absolute inset-0 opacity-40 dark:opacity-30"
+                style={{
+                  backgroundImage:
+                    'radial-gradient(circle at 25% 30%, rgba(87,63,38,0.28) 0 1.5px, transparent 2px), radial-gradient(circle at 70% 65%, rgba(87,63,38,0.22) 0 2px, transparent 2.5px), repeating-linear-gradient(180deg, rgba(87,63,38,0.12) 0 2px, transparent 2px 10px)',
+                  backgroundSize: '18px 18px, 22px 22px, 100% 10px',
+                }}
+              />
+              <div
+                className="absolute inset-x-0 bottom-0 border-t-2 transition-all duration-700"
+                style={{
+                  height: `${nivel}%`,
+                  borderColor: 'rgba(214,240,201,0.85)',
+                  background: 'linear-gradient(to top, #3d7f92 0%, #529bad 45%, #82b953 100%)',
+                }}
+              />
+              <div
+                className="absolute inset-x-0 border-t-2 border-dashed border-rose-400"
+                style={{ bottom: `${umbral}%` }}
+              />
             </div>
           </div>
           <div className="min-w-0 space-y-2">
+            <div className="flex items-baseline gap-1">
+              <span className="font-mono text-4xl font-bold leading-none tabular-nums">{humedad}</span>
+              <span className="font-mono text-sm text-slate-400">%</span>
+            </div>
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${estado.fondo}`}
             >

@@ -47,8 +47,8 @@ export default function HumedadChart({
         <AreaChart data={datos} margin={{ top: 12, right: 8, left: -18, bottom: 0 }}>
           <defs>
             <linearGradient id="gradienteHumedad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#10b981" stopOpacity={0.45} />
-              <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#6a9e3f" stopOpacity={0.45} />
+              <stop offset="100%" stopColor="#6a9e3f" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -74,21 +74,21 @@ export default function HumedadChart({
             axisLine={false}
             className="fill-slate-400"
           />
-          <Tooltip content={<TooltipRiego />} cursor={{ stroke: '#10b981', strokeDasharray: '4 4' }} />
+          <Tooltip content={<TooltipRiego />} cursor={{ stroke: '#6a9e3f', strokeDasharray: '4 4' }} />
           <ReferenceLine
             y={umbral}
-            stroke="#f43f5e"
+            stroke="#dc7255"
             strokeDasharray="5 5"
-            label={{ value: `Umbral ${umbral}%`, position: 'insideTopRight', fill: '#f43f5e', fontSize: 10 }}
+            label={{ value: `Umbral ${umbral}%`, position: 'insideTopRight', fill: '#dc7255', fontSize: 10 }}
           />
           <Area
             type="monotone"
             dataKey="humedad"
-            stroke="#10b981"
+            stroke="#6a9e3f"
             strokeWidth={2.5}
             fill="url(#gradienteHumedad)"
             dot={false}
-            activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff', fill: '#10b981' }}
+            activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff', fill: '#6a9e3f' }}
             isAnimationActive={false}
           />
         </AreaChart>
